@@ -75,7 +75,7 @@ function renderCampaigns() {
           <div>
             <div class="card-title">${esc(c.name)}</div>
             <div class="card-meta">
-              <span>📧 ${esc(c.recipientEmail)}</span>
+              <span title="${esc(c.recipientEmail)}">📧 ${formatEmails(c.recipientEmail)}</span>
               <span>📝 ${esc(c.subject.slice(0,40))}${c.subject.length>40?'...':''}</span>
             </div>
           </div>
@@ -108,6 +108,11 @@ async function deleteCampaign(id) {
 }
 
 function esc(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+function formatEmails(str) {
+  const arr = str.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+  if (arr.length <= 1) return esc(arr[0] || str);
+  return `${arr.length} Target Addresses`;
+}
 
 // Real-time updates
 socket.on('emailSent', (data) => {

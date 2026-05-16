@@ -35,7 +35,17 @@ function renderCampaign() {
 
   document.getElementById('campaignTitle').textContent = campaign.name;
   document.getElementById('liveCount').textContent = campaign.totalSent;
-  document.getElementById('previewTo').textContent = campaign.recipientEmail;
+  
+  // Distribute Target Email (Round Robin)
+  const targets = campaign.recipientEmail.split(/[\n,]+/).map(e => e.trim()).filter(Boolean);
+  const assignedTarget = targets[campaign.totalSent % targets.length] || '';
+  campaign.assignedTarget = assignedTarget; // Save for mailto link
+
+  document.getElementById('previewTo').textContent = assignedTarget;
+  if (targets.length > 1) {
+    document.getElementById('previewTo').textContent += ` (Assigned ${campaign.totalSent % targets.length + 1} of ${targets.length})`;
+  }
+
   document.getElementById('previewSubject').textContent = campaign.subject;
   document.getElementById('previewBody').textContent = campaign.body;
   document.title = `Send: ${campaign.name} — MASSMAIL TRACKER`;
@@ -67,7 +77,7 @@ document.getElementById('step1Next').addEventListener('click', () => {
 document.getElementById('openMailBtn').addEventListener('click', () => {
   const subject = encodeURIComponent(campaign.subject);
   const body = encodeURIComponent(campaign.body);
-  const mailto = `mailto:${campaign.recipientEmail}?subject=${subject}&body=${body}`;
+  const mailto = `mailto:${campaign.assignedTarget}?subject=${subject}&body=${body}`;
   window.open(mailto, '_self');
 
   // After a short delay, activate step 3

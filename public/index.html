@@ -67,9 +67,9 @@
             <label for="campaignName">Campaign Name</label>
             <input type="text" id="campaignName" placeholder="e.g., Product Launch Outreach" required>
           </div>
-          <div class="form-group">
-            <label for="recipientEmail">Recipient Email (TO field)</label>
-            <input type="email" id="recipientEmail" placeholder="e.g., target@company.com" required>
+          <div class="form-group full-width">
+            <label for="recipientEmail">Target Email Addresses (Distribute to Senders)</label>
+            <textarea id="recipientEmail" rows="3" placeholder="e.g., target1@company.com, target2@company.com&#10;Paste multiple emails separated by commas or newlines.&#10;Each sender will automatically be assigned one email from this list (Round-Robin distribution)!" required></textarea>
           </div>
           <div class="form-group full-width">
             <label for="emailSubject">Email Subject Line</label>
