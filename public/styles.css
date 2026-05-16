@@ -290,6 +290,49 @@ textarea { resize: vertical; min-height: 100px; }
 .send-item-name { font-weight: 600; }
 .send-item-time { color: var(--text-muted); font-family: var(--mono); font-size: 0.72rem; }
 
+/* ─── ONE-TAP SEND AREA ─────────────────────────────────────────────────── */
+.action-area { margin-top: 1.5rem; }
+
+.email-preview-details {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 1.2rem; overflow: hidden;
+}
+.email-preview-details[open] { border-color: var(--accent); }
+.preview-toggle {
+  padding: 0.85rem 1.1rem; font-size: 0.82rem; font-weight: 600;
+  color: var(--text-secondary); cursor: pointer; list-style: none;
+  display: flex; align-items: center; gap: 0.5rem;
+  transition: var(--transition);
+}
+.preview-toggle:hover { color: var(--accent-light); }
+.preview-toggle::-webkit-details-marker { display: none; }
+.email-preview-details .email-preview { border: none; border-top: 1px solid var(--border); border-radius: 0; }
+
+.inline-name { margin-bottom: 1rem; }
+
+.btn-mega-send {
+  width: 100%; padding: 1.2rem 1.5rem;
+  background: linear-gradient(135deg, #2563eb, #6366f1, #a855f7);
+  background-size: 200% 200%; animation: shimmer 4s ease infinite;
+  color: white; border: none; border-radius: var(--radius);
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  cursor: pointer; transition: var(--transition); text-align: center;
+  box-shadow: 0 4px 30px rgba(99, 102, 241, 0.3);
+}
+.btn-mega-send:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(99, 102, 241, 0.5);
+}
+.btn-mega-send:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+.btn-mega-send svg { width: 28px; height: 28px; }
+.btn-mega-send span { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.5px; }
+.btn-mega-send small {
+  font-size: 0.72rem; font-weight: 400; opacity: 0.8;
+  max-width: 320px; line-height: 1.4;
+}
+
+.alt-actions { text-align: center; margin-top: 0.8rem; }
+
 /* ─── DASHBOARD PAGE ────────────────────────────────────────────────────── */
 .dashboard-page { max-width: 900px; }
 .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }

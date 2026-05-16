@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Send Email — MASSMAIL TRACKER</title>
-  <meta name="description" content="Send a pre-composed email and confirm it was sent to track the campaign progress.">
+  <meta name="description" content="Join the campaign — send a pre-composed email with one tap and help the community reach its goal.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
@@ -32,78 +32,69 @@
     <div class="sender-interface hidden" id="senderInterface">
 
       <header class="sender-header">
-        <div class="campaign-badge">CAMPAIGN</div>
+        <div class="campaign-badge">COMMUNITY CAMPAIGN</div>
         <h1 id="campaignTitle">—</h1>
-        <p class="sender-desc">Follow the steps below to send the email and confirm your contribution.</p>
+        <p class="sender-desc" id="campaignDesc">Join the movement — send this email with one tap to add your voice.</p>
       </header>
 
-      <!-- Live counter -->
+      <!-- Live counter — big and prominent -->
       <div class="live-counter-card">
         <div class="live-dot-wrapper">
           <span class="live-dot"></span>
           <span class="live-label">LIVE</span>
         </div>
         <div class="counter-value" id="liveCount">0</div>
-        <div class="counter-label">Emails Sent So Far</div>
+        <div class="counter-label">People Have Sent This Email</div>
       </div>
 
-      <!-- Step cards -->
-      <div class="steps-container">
+      <!-- ─── ONE-TAP ACTION AREA ──────────────────────────────────── -->
+      <div class="action-area" id="actionArea">
 
-        <!-- STEP 1: Enter name -->
-        <div class="step-card active" id="step1">
-          <div class="step-number">1</div>
-          <div class="step-content">
-            <h3>Enter Your Name</h3>
-            <p>So we can track who contributed (optional).</p>
-            <input type="text" id="senderName" class="step-input" placeholder="Your name (or leave blank for anonymous)">
-            <button class="btn btn-primary btn-step" id="step1Next">
-              Next →
-            </button>
-          </div>
-        </div>
-
-        <!-- STEP 2: Preview & Send -->
-        <div class="step-card" id="step2">
-          <div class="step-number">2</div>
-          <div class="step-content">
-            <h3>Preview & Open Email</h3>
-            <div class="email-preview" id="emailPreview">
-              <div class="preview-row">
-                <span class="preview-label">TO:</span>
-                <span id="previewTo">—</span>
-              </div>
-              <div class="preview-row">
-                <span class="preview-label">SUBJECT:</span>
-                <span id="previewSubject">—</span>
-              </div>
-              <div class="preview-divider"></div>
-              <div class="preview-body" id="previewBody">—</div>
+        <!-- Expandable email preview -->
+        <details class="email-preview-details">
+          <summary class="preview-toggle">👁 Preview Email Before Sending</summary>
+          <div class="email-preview" id="emailPreview">
+            <div class="preview-row">
+              <span class="preview-label">TO:</span>
+              <span id="previewTo">—</span>
             </div>
-            <button class="btn btn-send" id="openMailBtn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              Open in Email Client
-            </button>
-            <p class="step-hint">This will open your default email app with the message pre-filled. Hit send there, then come back here.</p>
+            <div class="preview-row" id="ccRow" style="display:none">
+              <span class="preview-label">CC:</span>
+              <span id="previewCc">—</span>
+            </div>
+            <div class="preview-row" id="bccRow" style="display:none">
+              <span class="preview-label">BCC:</span>
+              <span id="previewBcc">—</span>
+            </div>
+            <div class="preview-row">
+              <span class="preview-label">SUBJECT:</span>
+              <span id="previewSubject">—</span>
+            </div>
+            <div class="preview-divider"></div>
+            <div class="preview-body" id="previewBody">—</div>
           </div>
+        </details>
+
+        <!-- Name input (optional, inline) -->
+        <div class="inline-name">
+          <input type="text" id="senderName" placeholder="Your name (optional — for the leaderboard)" class="step-input">
         </div>
 
-        <!-- STEP 3: Confirm -->
-        <div class="step-card" id="step3">
-          <div class="step-number">3</div>
-          <div class="step-content">
-            <h3>Confirm You Sent It</h3>
-            <p>Did you successfully send the email from your email client?</p>
-            <button class="btn btn-confirm" id="confirmBtn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><polyline points="20 6 9 17 4 12"/></svg>
-              Yes, I Sent It!
-            </button>
-          </div>
+        <!-- THE BIG BUTTON -->
+        <button class="btn btn-mega-send" id="megaSendBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+          <span>Send Email Now</span>
+          <small>Opens your email app with everything pre-filled. Just hit Send!</small>
+        </button>
+
+        <!-- Alternative: Copy to clipboard -->
+        <div class="alt-actions">
+          <button class="btn btn-ghost btn-sm" id="copyAllBtn">📋 Copy Email Content (for manual paste)</button>
         </div>
 
       </div>
 
-      <!-- SUCCESS STATE -->
+      <!-- ─── ALREADY SENT / SUCCESS STATE ─────────────────────────── -->
       <div class="success-state hidden" id="successState">
         <div class="success-checkmark">
           <svg viewBox="0 0 80 80" fill="none">
@@ -117,17 +108,18 @@
             </defs>
           </svg>
         </div>
-        <h2>Email Confirmed! 🎉</h2>
-        <p>Your send has been recorded. Thank you for contributing!</p>
+        <h2>Thank You! 🎉</h2>
+        <p>Your email has been recorded. You're making a difference!</p>
         <div class="success-count">
-          <span>Total sent in this campaign:</span>
+          <span>Total community sends:</span>
           <strong id="successTotal">0</strong>
         </div>
+        <button class="btn btn-ghost" id="sendAnotherBtn" style="margin-top:1rem;">🔁 Send Again (to another target)</button>
       </div>
 
       <!-- Recent sends feed -->
       <div class="recent-sends" id="recentSends">
-        <h3>🔥 Recent Sends</h3>
+        <h3>🔥 Community Activity</h3>
         <div class="sends-feed" id="sendsFeed">
           <!-- Populated dynamically -->
         </div>

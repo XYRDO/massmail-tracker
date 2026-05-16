@@ -8,13 +8,14 @@ const campaignId = location.pathname.split('/').pop();
 const loadingState = document.getElementById('loadingState');
 const errorState = document.getElementById('errorState');
 const senderInterface = document.getElementById('senderInterface');
-const step1 = document.getElementById('step1');
-const step2 = document.getElementById('step2');
-const step3 = document.getElementById('step3');
+const actionArea = document.getElementById('actionArea');
 const successState = document.getElementById('successState');
-const stepsContainer = document.querySelector('.steps-container');
 
 let campaign = null;
+let hasSent = false;
+
+// Check if this user already sent (localStorage)
+const sentKey = `sent_${campaignId}`;
 
 // Load campaign
 async function loadCampaign() {
@@ -35,34 +36,36 @@ function renderCampaign() {
 
   document.getElementById('campaignTitle').textContent = campaign.name;
   document.getElementById('liveCount').textContent = campaign.totalSent;
-  
+
   // Distribute Target Email (Round Robin)
   const targets = campaign.recipientEmail.split(/[\n,]+/).map(e => e.trim()).filter(Boolean);
-  const assignedTarget = targets[campaign.totalSent % targets.length] || '';
-  campaign.assignedTarget = assignedTarget; // Save for mailto link
+  const assignedTarget = targets[campaign.totalSent % targets.length] || targets[0];
+  campaign.assignedTarget = assignedTarget;
+  campaign._allTargets = targets;
 
   document.getElementById('previewTo').textContent = assignedTarget;
   if (targets.length > 1) {
-    document.getElementById('previewTo').textContent += ` (Assigned ${campaign.totalSent % targets.length + 1} of ${targets.length})`;
+    document.getElementById('previewTo').textContent = assignedTarget + ` (Target ${(campaign.totalSent % targets.length) + 1} of ${targets.length})`;
+  }
+
+  // CC / BCC
+  if (campaign.ccEmail) {
+    document.getElementById('ccRow').style.display = '';
+    document.getElementById('previewCc').textContent = campaign.ccEmail;
+  }
+  if (campaign.bccEmail) {
+    document.getElementById('bccRow').style.display = '';
+    document.getElementById('previewBcc').textContent = campaign.bccEmail;
   }
 
   document.getElementById('previewSubject').textContent = campaign.subject;
   document.getElementById('previewBody').textContent = campaign.body;
+  document.title = `Join: ${campaign.name} — MASSMAIL TRACKER`;
 
-  // Show CC/BCC if they exist
-  const previewTo = document.getElementById('previewTo');
-  if (campaign.ccEmail) {
-    const ccDiv = document.createElement('div');
-    ccDiv.innerHTML = `<small style="color:var(--text-muted)">CC: ${esc(campaign.ccEmail)}</small>`;
-    previewTo.parentNode.insertBefore(ccDiv, previewTo.nextSibling);
+  // If user already sent, show success but allow sending again
+  if (localStorage.getItem(sentKey)) {
+    // Don't block — let them send again to another target
   }
-  if (campaign.bccEmail) {
-    const bccDiv = document.createElement('div');
-    bccDiv.innerHTML = `<small style="color:var(--text-muted)">BCC: ${esc(campaign.bccEmail)}</small>`;
-    previewTo.parentNode.insertBefore(bccDiv, previewTo.nextSibling);
-  }
-
-  document.title = `Send: ${campaign.name} — MASSMAIL TRACKER`;
 
   renderRecentSends();
 }
@@ -71,7 +74,7 @@ function renderRecentSends() {
   const feed = document.getElementById('sendsFeed');
   const recent = (campaign.senders || []).slice(-10).reverse();
   if (recent.length === 0) {
-    feed.innerHTML = '<div class="send-item" style="justify-content:center;color:var(--text-muted)">No sends yet. Be the first!</div>';
+    feed.innerHTML = '<div class="send-item" style="justify-content:center;color:var(--text-muted)">No sends yet. Be the first! 🚀</div>';
     return;
   }
   feed.innerHTML = recent.map(s => `
@@ -81,57 +84,74 @@ function renderRecentSends() {
     </div>`).join('');
 }
 
-// Step navigation
-document.getElementById('step1Next').addEventListener('click', () => {
-  step1.classList.remove('active');
-  step1.classList.add('done');
-  step2.classList.add('active');
-});
+// ─── MEGA SEND BUTTON ──────────────────────────────────────────────────
+document.getElementById('megaSendBtn').addEventListener('click', async () => {
+  const senderName = document.getElementById('senderName').value.trim() || 'Anonymous';
+  const btn = document.getElementById('megaSendBtn');
 
-document.getElementById('openMailBtn').addEventListener('click', () => {
+  // Build mailto link
   const subject = encodeURIComponent(campaign.subject);
   const body = encodeURIComponent(campaign.body);
   let mailto = `mailto:${campaign.assignedTarget}?subject=${subject}&body=${body}`;
-  
   if (campaign.ccEmail) mailto += `&cc=${encodeURIComponent(campaign.ccEmail)}`;
   if (campaign.bccEmail) mailto += `&bcc=${encodeURIComponent(campaign.bccEmail)}`;
-  
+
+  // Open mailto
   window.open(mailto, '_self');
 
-  // After a short delay, activate step 3
-  setTimeout(() => {
-    step2.classList.remove('active');
-    step2.classList.add('done');
-    step3.classList.add('active');
-  }, 1500);
-});
-
-document.getElementById('confirmBtn').addEventListener('click', async () => {
-  const senderName = document.getElementById('senderName').value.trim() || 'Anonymous';
-  const btn = document.getElementById('confirmBtn');
+  // Auto-record after 2 seconds (trust-based — they clicked the button)
+  btn.innerHTML = '<span class="spinner" style="width:22px;height:22px;border-width:2px;margin:0"></span> <span>Opening your email app...</span>';
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;margin:0"></span> Recording...';
 
-  try {
-    const res = await fetch(`/api/campaigns/${campaignId}/send`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ senderName })
-    });
-    const data = await res.json();
+  setTimeout(async () => {
+    try {
+      const res = await fetch(`/api/campaigns/${campaignId}/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senderName })
+      });
+      const data = await res.json();
 
-    // Hide steps, show success
-    stepsContainer.style.display = 'none';
-    successState.classList.remove('hidden');
-    document.getElementById('successTotal').textContent = data.totalSent;
-  } catch (e) {
-    btn.disabled = false;
-    btn.innerHTML = '✅ Yes, I Sent It!';
-    alert('Error recording send. Please try again.');
-  }
+      // Mark as sent
+      localStorage.setItem(sentKey, Date.now().toString());
+
+      // Show success
+      actionArea.style.display = 'none';
+      successState.classList.remove('hidden');
+      document.getElementById('successTotal').textContent = data.totalSent;
+    } catch (e) {
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+        <span>Send Email Now</span>
+        <small>Opens your email app with everything pre-filled. Just hit Send!</small>`;
+      alert('Error recording your send. Please try again.');
+    }
+  }, 2500);
 });
 
-// Real-time updates
+// ─── COPY TO CLIPBOARD FALLBACK ────────────────────────────────────────
+document.getElementById('copyAllBtn').addEventListener('click', () => {
+  const text = `TO: ${campaign.assignedTarget}\n${campaign.ccEmail ? 'CC: ' + campaign.ccEmail + '\n' : ''}${campaign.bccEmail ? 'BCC: ' + campaign.bccEmail + '\n' : ''}SUBJECT: ${campaign.subject}\n\n${campaign.body}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.createElement('div');
+    toast.className = 'copy-toast';
+    toast.textContent = '✅ Email content copied! Paste it into your email app.';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  });
+});
+
+// ─── SEND ANOTHER BUTTON ──────────────────────────────────────────────
+document.getElementById('sendAnotherBtn').addEventListener('click', () => {
+  successState.classList.add('hidden');
+  actionArea.style.display = '';
+
+  // Re-render to get next round-robin target
+  loadCampaign();
+});
+
+// ─── REAL-TIME UPDATES ─────────────────────────────────────────────────
 socket.on('emailSent', (data) => {
   if (data.campaignId !== campaignId) return;
 
