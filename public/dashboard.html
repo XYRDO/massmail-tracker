@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Dashboard — MASSMAIL TRACKER</title>
+  <meta name="description" content="Real-time live dashboard showing email campaign sending progress.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="dashboard-body">
+  <canvas id="particleCanvas"></canvas>
+
+  <div class="app-container dashboard-page">
+
+    <!-- ─── LOADING ─────────────────────────────────────────────────────── -->
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <p>Loading dashboard...</p>
+    </div>
+
+    <!-- ─── ERROR ───────────────────────────────────────────────────────── -->
+    <div class="error-state hidden" id="errorState">
+      <div class="empty-icon">❌</div>
+      <h3>Campaign Not Found</h3>
+      <a href="/" class="btn btn-primary" style="margin-top:1rem;display:inline-flex;">Go Home</a>
+    </div>
+
+    <!-- ─── DASHBOARD CONTENT ───────────────────────────────────────────── -->
+    <div class="dashboard-content hidden" id="dashboardContent">
+
+      <header class="dash-header">
+        <div>
+          <div class="campaign-badge">LIVE DASHBOARD</div>
+          <h1 id="dashTitle">—</h1>
+        </div>
+        <a href="/" class="btn btn-ghost">← Back</a>
+      </header>
+
+      <!-- ─── STATS ROW ───────────────────────────────────────────────────── -->
+      <div class="stats-row">
+        <div class="stat-card glow-card">
+          <div class="stat-card-icon">📧</div>
+          <div class="stat-card-value" id="dashTotal">0</div>
+          <div class="stat-card-label">Total Emails Sent</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">🕐</div>
+          <div class="stat-card-value" id="dashLastSent">—</div>
+          <div class="stat-card-label">Last Send</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">⚡</div>
+          <div class="stat-card-value" id="dashRate">0</div>
+          <div class="stat-card-label">Sends / Hour</div>
+        </div>
+      </div>
+
+      <!-- ─── PROGRESS BAR ─────────────────────────────────────────────────── -->
+      <div class="progress-section">
+        <div class="progress-header">
+          <span>Campaign Progress</span>
+          <span id="progressText">0 emails</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- ─── LIVE FEED ────────────────────────────────────────────────────── -->
+      <div class="live-feed-section">
+        <div class="live-feed-header">
+          <span class="live-dot"></span>
+          <h3>Live Send Feed</h3>
+        </div>
+        <div class="live-feed" id="liveFeed">
+          <div class="feed-empty">Waiting for sends...</div>
+        </div>
+      </div>
+
+      <!-- ─── SENDERS TABLE ────────────────────────────────────────────────── -->
+      <div class="senders-table-section">
+        <h3>All Senders</h3>
+        <div class="table-wrapper">
+          <table class="senders-table" id="sendersTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sender</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="sendersBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Email — MASSMAIL TRACKER</title>
+  <meta name="description" content="Send a pre-composed email and confirm it was sent to track the campaign progress.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <canvas id="particleCanvas"></canvas>
+
+  <div class="app-container sender-page">
+
+    <!-- ─── LOADING STATE ─────────────────────────────────────────────────── -->
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <p>Loading campaign...</p>
+    </div>
+
+    <!-- ─── ERROR STATE ───────────────────────────────────────────────────── -->
+    <div class="error-state hidden" id="errorState">
+      <div class="empty-icon">❌</div>
+      <h3>Campaign Not Found</h3>
+      <p>This campaign link is invalid or has been deleted.</p>
+      <a href="/" class="btn btn-primary" style="margin-top:1rem;display:inline-flex;">Go Home</a>
+    </div>
+
+    <!-- ─── SENDER INTERFACE ──────────────────────────────────────────────── -->
+    <div class="sender-interface hidden" id="senderInterface">
+
+      <header class="sender-header">
+        <div class="campaign-badge">CAMPAIGN</div>
+        <h1 id="campaignTitle">—</h1>
+        <p class="sender-desc">Follow the steps below to send the email and confirm your contribution.</p>
+      </header>
+
+      <!-- Live counter -->
+      <div class="live-counter-card">
+        <div class="live-dot-wrapper">
+          <span class="live-dot"></span>
+          <span class="live-label">LIVE</span>
+        </div>
+        <div class="counter-value" id="liveCount">0</div>
+        <div class="counter-label">Emails Sent So Far</div>
+      </div>
+
+      <!-- Step cards -->
+      <div class="steps-container">
+
+        <!-- STEP 1: Enter name -->
+        <div class="step-card active" id="step1">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Enter Your Name</h3>
+            <p>So we can track who contributed (optional).</p>
+            <input type="text" id="senderName" class="step-input" placeholder="Your name (or leave blank for anonymous)">
+            <button class="btn btn-primary btn-step" id="step1Next">
+              Next →
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Preview & Send -->
+        <div class="step-card" id="step2">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Preview & Open Email</h3>
+            <div class="email-preview" id="emailPreview">
+              <div class="preview-row">
+                <span class="preview-label">TO:</span>
+                <span id="previewTo">—</span>
+              </div>
+              <div class="preview-row">
+                <span class="preview-label">SUBJECT:</span>
+                <span id="previewSubject">—</span>
+              </div>
+              <div class="preview-divider"></div>
+              <div class="preview-body" id="previewBody">—</div>
+            </div>
+            <button class="btn btn-send" id="openMailBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Open in Email Client
+            </button>
+            <p class="step-hint">This will open your default email app with the message pre-filled. Hit send there, then come back here.</p>
+          </div>
+        </div>
+
+        <!-- STEP 3: Confirm -->
+        <div class="step-card" id="step3">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Confirm You Sent It</h3>
+            <p>Did you successfully send the email from your email client?</p>
+            <button class="btn btn-confirm" id="confirmBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><polyline points="20 6 9 17 4 12"/></svg>
+              Yes, I Sent It!
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SUCCESS STATE -->
+      <div class="success-state hidden" id="successState">
+        <div class="success-checkmark">
+          <svg viewBox="0 0 80 80" fill="none">
+            <circle cx="40" cy="40" r="36" stroke="url(#successGrad)" stroke-width="3"/>
+            <polyline points="24,42 36,54 56,30" stroke="url(#successGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="successGrad" x1="0" y1="0" x2="80" y2="80">
+                <stop stop-color="#22c55e"/>
+                <stop offset="1" stop-color="#10b981"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h2>Email Confirmed! 🎉</h2>
+        <p>Your send has been recorded. Thank you for contributing!</p>
+        <div class="success-count">
+          <span>Total sent in this campaign:</span>
+          <strong id="successTotal">0</strong>
+        </div>
+      </div>
+
+      <!-- Recent sends feed -->
+      <div class="recent-sends" id="recentSends">
+        <h3>🔥 Recent Sends</h3>
+        <div class="sends-feed" id="sendsFeed">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/sender.js"></script>
+</body>
+</html>
