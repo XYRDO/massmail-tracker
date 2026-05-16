@@ -4,10 +4,6 @@ const { Server } = require('socket.io');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const { MongoClient } = require('mongodb');
-const dns = require('node:dns');
-
-// Force public DNS to resolve Atlas SRV records
-dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 const app = express();
 const server = http.createServer(app);
@@ -29,10 +25,7 @@ let db;
 async function connectDB() {
   try {
     const client = new MongoClient(MONGO_URI, {
-      serverSelectionTimeoutMS: 15000,
-      autoSelectFamily: false,
-      tls: true,
-      tlsAllowInvalidCertificates: true // Bypass local SSL inspection issues
+      serverSelectionTimeoutMS: 15000
     });
     await client.connect();
     db = client.db(DB_NAME);
