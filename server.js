@@ -45,7 +45,7 @@ function campaigns() { return db.collection('campaigns'); }
 // Create a new campaign
 app.post('/api/campaigns', async (req, res) => {
   try {
-    const { name, subject, body, recipientEmail } = req.body;
+    const { name, subject, body, recipientEmail, ccEmail, bccEmail } = req.body;
     if (!name || !subject || !body || !recipientEmail) {
       return res.status(400).json({ error: 'Missing required fields: name, subject, body, recipientEmail' });
     }
@@ -56,6 +56,8 @@ app.post('/api/campaigns', async (req, res) => {
       subject,
       body,
       recipientEmail,
+      ccEmail: ccEmail || '',
+      bccEmail: bccEmail || '',
       createdAt: new Date().toISOString(),
       totalSent: 0,
       senders: []

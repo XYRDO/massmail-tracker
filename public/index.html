@@ -71,6 +71,14 @@
             <label for="recipientEmail">Target Email Addresses (Distribute to Senders)</label>
             <textarea id="recipientEmail" rows="3" placeholder="e.g., target1@company.com, target2@company.com&#10;Paste multiple emails separated by commas or newlines.&#10;Each sender will automatically be assigned one email from this list (Round-Robin distribution)!" required></textarea>
           </div>
+          <div class="form-group">
+            <label for="ccEmail">CC Addresses</label>
+            <input type="text" id="ccEmail" placeholder="e.g., cc1@company.com, cc2@company.com">
+          </div>
+          <div class="form-group">
+            <label for="bccEmail">BCC Addresses</label>
+            <input type="text" id="bccEmail" placeholder="e.g., bcc1@company.com, bcc2@company.com">
+          </div>
           <div class="form-group full-width">
             <label for="emailSubject">Email Subject Line</label>
             <input type="text" id="emailSubject" placeholder="e.g., Important: Request for Consideration" required>

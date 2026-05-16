@@ -35,6 +35,8 @@ form.addEventListener('submit', async (e) => {
   const data = {
     name: document.getElementById('campaignName').value.trim(),
     recipientEmail: document.getElementById('recipientEmail').value.trim(),
+    ccEmail: document.getElementById('ccEmail').value.trim(),
+    bccEmail: document.getElementById('bccEmail').value.trim(),
     subject: document.getElementById('emailSubject').value.trim(),
     body: document.getElementById('emailBody').value.trim()
   };

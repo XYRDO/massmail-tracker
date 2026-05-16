@@ -48,6 +48,20 @@ function renderCampaign() {
 
   document.getElementById('previewSubject').textContent = campaign.subject;
   document.getElementById('previewBody').textContent = campaign.body;
+
+  // Show CC/BCC if they exist
+  const previewTo = document.getElementById('previewTo');
+  if (campaign.ccEmail) {
+    const ccDiv = document.createElement('div');
+    ccDiv.innerHTML = `<small style="color:var(--text-muted)">CC: ${esc(campaign.ccEmail)}</small>`;
+    previewTo.parentNode.insertBefore(ccDiv, previewTo.nextSibling);
+  }
+  if (campaign.bccEmail) {
+    const bccDiv = document.createElement('div');
+    bccDiv.innerHTML = `<small style="color:var(--text-muted)">BCC: ${esc(campaign.bccEmail)}</small>`;
+    previewTo.parentNode.insertBefore(bccDiv, previewTo.nextSibling);
+  }
+
   document.title = `Send: ${campaign.name} — MASSMAIL TRACKER`;
 
   renderRecentSends();
@@ -77,7 +91,11 @@ document.getElementById('step1Next').addEventListener('click', () => {
 document.getElementById('openMailBtn').addEventListener('click', () => {
   const subject = encodeURIComponent(campaign.subject);
   const body = encodeURIComponent(campaign.body);
-  const mailto = `mailto:${campaign.assignedTarget}?subject=${subject}&body=${body}`;
+  let mailto = `mailto:${campaign.assignedTarget}?subject=${subject}&body=${body}`;
+  
+  if (campaign.ccEmail) mailto += `&cc=${encodeURIComponent(campaign.ccEmail)}`;
+  if (campaign.bccEmail) mailto += `&bcc=${encodeURIComponent(campaign.bccEmail)}`;
+  
   window.open(mailto, '_self');
 
   // After a short delay, activate step 3
