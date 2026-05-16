@@ -12,11 +12,9 @@ const io = new Server(server);
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ─── MongoDB Atlas Connection ──────────────────────────────────────────────
-const MONGO_URI = process.env.MONGODB_URI;
+const MONGO_URI = process.env.MONGODB_URI || '';
 if (!MONGO_URI) {
-  console.error('FATAL ERROR: MONGODB_URI is not defined in environment variables.');
-  process.exit(1);
+  console.log('⚠️ WARNING: MONGODB_URI is not defined in environment variables. Database operations will fail.');
 }
 const DB_NAME = 'massmail_tracker';
 
@@ -180,15 +178,14 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3000;
 
 async function start() {
+  console.log('starting server initialization...');
   const connected = await connectDB();
   if (!connected) {
-    console.error('Cannot start without database. Exiting.');
-    process.exit(1);
+    console.log('⚠️ Warning: Database not connected. The server will still start, but API calls will fail.');
   }
-  server.listen(PORT, () => {
-    console.log(`\n🚀 Mass Email Tracker running at http://localhost:${PORT}`);
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(`\n🚀 Mass Email Tracker running on port ${PORT}`);
     console.log(`📊 Dashboard: http://localhost:${PORT}`);
-    console.log(`💾 Database: MongoDB Atlas (cloud-persistent)`);
     console.log(`\nPress Ctrl+C to stop.\n`);
   });
 }
